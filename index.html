@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POSKA İçerik Üreticisi</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Raleway:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #B5341C;
+    --brand-dark: #8C2615;
+    --brand-light: #D4503A;
+    --bg: #0F0F0D;
+    --bg2: #1A1916;
+    --bg3: #232320;
+    --bg4: #2E2D29;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(181,52,28,0.4);
+    --text: #F0EDE8;
+    --text2: #A09B94;
+    --text3: #6B6660;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--text);
+  }
+  .logo span { color: var(--brand); }
+  .logo-sub {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .header-badge {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 1px;
+    background: var(--bg3);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 20px 32px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text3);
+    cursor: pointer;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab:hover { color: var(--text2); }
+  .tab.active {
+    color: var(--text);
+    background: var(--bg);
+    border-color: var(--border);
+    border-bottom-color: var(--bg);
+    position: relative;
+    bottom: -1px;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 28px 28px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+
+  select, input[type="text"], textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B6660' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  select:focus, input[type="text"]:focus, textarea:focus { border-color: var(--brand); }
+  select option { background: var(--bg3); }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  /* KEYWORD CHIPS */
+  .chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--brand-light); color: var(--text); }
+  .chip.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+  /* MODE CARDS */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mode-card {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mode-card:hover { border-color: var(--border-hover); }
+  .mode-card.active { border-color: var(--brand); background: rgba(181,52,28,0.08); }
+  .mode-card-icon { font-size: 18px; margin-bottom: 6px; }
+  .mode-card-title { font-size: 12px; font-weight: 600; color: var(--text); }
+  .mode-card-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* GENERATE BUTTON */
+  .btn-generate {
+    width: 100%;
+    padding: 14px;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-generate:hover { background: var(--brand-light); transform: translateY(-1px); }
+  .btn-generate:active { transform: translateY(0); }
+  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    padding: 9px 16px;
+    background: var(--bg3);
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-secondary:hover { border-color: var(--border-hover); color: var(--text); }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    padding: 32px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: var(--bg);
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .output-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .output-actions { display: flex; gap: 8px; }
+
+  .output-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    min-height: 200px;
+    flex: 1;
+    font-family: 'Raleway', sans-serif;
+  }
+  .output-box.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text3);
+    font-size: 13px;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 400px;
+  }
+  .empty-icon { font-size: 36px; opacity: 0.4; }
+
+  .loading-bar {
+    height: 2px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+    display: none;
+  }
+  .loading-bar.active { display: block; }
+  .loading-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--brand), transparent);
+    animation: loading 1.5s infinite;
+    width: 40%;
+  }
+  @keyframes loading {
+    0% { transform: translateX(-200%); }
+    100% { transform: translateX(400%); }
+  }
+
+  /* META SECTION */
+  .meta-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .meta-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .meta-card-label { font-size: 10px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; }
+  .meta-card-value { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+  /* NOTIFICATION */
+  .notif {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg3);
+    border: 1px solid var(--brand);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+  }
+  .notif.show { transform: translateY(0); opacity: 1; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); }
+
+  /* API KEY */
+  .api-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .api-status {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text3);
+    flex-shrink: 0;
+  }
+  .api-status.ok { background: #4CAF50; }
+
+  /* TABS PANEL */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: contents; }
+
+  /* SOCIAL PANEL specifics */
+  .platform-toggle {
+    display: flex;
+    gap: 8px;
+  }
+  .platform-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .platform-btn.active { border-color: var(--brand); background: rgba(181,52,28,0.12); color: var(--text); }
+
+  /* SCROLL */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">po<span>.</span>s<span>.</span>ka</div>
+    <div class="logo-sub">İçerik Üreticisi</div>
+  </div>
+  <div class="header-badge">v2.0</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('blog')">📝 Blog Yazısı</div>
+  <div class="tab" onclick="switchTab('social')">📱 Sosyal Medya</div>
+  <div class="tab" onclick="switchTab('material')">🧪 Materyal & Güvenlik</div>
+  <div class="tab" onclick="switchTab('settings')">⚙️ Ayarlar</div>
+</div>
+
+<div class="main">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- BLOG TAB -->
+    <div class="tab-panel active" id="panel-blog">
+
+      <div class="field-group">
+        <div class="section-label">Hedef Kitle</div>
+        <select id="blog-audience">
+          <option>Meal-prep yapan ev hanımları</option>
+          <option>Sağlıklı beslenmeye yeni başlayanlar</option>
+          <option>Sporcular ve fitness meraklıları</option>
+          <option>Yoğun çalışan profesyoneller</option>
+          <option>Bebek maması hazırlayan ebeveynler</option>
+          <option>Diyet yapan bireyler</option>
+          <option>Gıda israfını azaltmak isteyenler</option>
+          <option>Vejetaryen / vegan bireyler</option>
+          <option>Yeni evliler / ilk defa yemek yapanlar</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">İçerik Tipi</div>
+        <div class="mode-grid">
+          <div class="mode-card active" onclick="selectMode(this,'blog-mode','rehber')" data-val="rehber">
+            <div class="mode-card-icon">📖</div>
+            <div class="mode-card-title">Rehber / Nasıl Yapılır</div>
+            <div class="mode-card-desc">Adım adım anlatım</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'blog-mode','liste')" data-val="liste">
+            <div class="mode-card-icon">📋</div>
+            <div class="mode-card-title">Liste Yazısı</div>
+            <div class="mode-card-desc">Top 5, 7 ipucu vb.</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'blog-mode','karsilastirma')" data-val="karsilastirma">
+            <div class="mode-card-icon">⚖️</div>
+            <div class="mode-card-title">Karşılaştırma</div>
+            <div class="mode-card-desc">A vs B analizi</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'blog-mode','hikaye')" data-val="hikaye">
+            <div class="mode-card-icon">✨</div>
+            <div class="mode-card-title">Hikaye / Deneyim</div>
+            <div class="mode-card-desc">Kişisel anlatı</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'blog-mode','sss')" data-val="sss">
+            <div class="mode-card-icon">❓</div>
+            <div class="mode-card-title">Sık Sorulan Sorular</div>
+            <div class="mode-card-desc">S&C formatı</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'blog-mode','tarifle')" data-val="tarifle">
+            <div class="mode-card-icon">🍳</div>
+            <div class="mode-card-title">Tarif + Saklama</div>
+            <div class="mode-card-desc">Yemek + porsiyon</div>
+          </div>
+        </div>
+        <input type="hidden" id="blog-mode" value="rehber">
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Uzunluk</div>
+        <select id="blog-length">
+          <option value="kisa">Kısa (400-600 kelime)</option>
+          <option value="orta" selected>Orta (800-1000 kelime)</option>
+          <option value="uzun">Uzun (1200-1500 kelime)</option>
+          <option value="kapsamli">Kapsamlı (2000+ kelime — pillar)</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Konu / Başlık Fikri</div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="blog-topic" placeholder="Boş bırakın, öneri üretelim...">
+          <button class="btn-secondary" onclick="suggestTopic()">✦ Öner</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">SEO Anahtar Kelimeler</div>
+        <div class="chips-wrap" id="blog-chips">
+          <div class="chip active" onclick="toggleChip(this)">porsiyon saklama</div>
+          <div class="chip active" onclick="toggleChip(this)">meal prep</div>
+          <div class="chip" onclick="toggleChip(this)">yemek hazırlığı</div>
+          <div class="chip" onclick="toggleChip(this)">sağlıklı beslenme</div>
+          <div class="chip" onclick="toggleChip(this)">kalori kontrolü</div>
+          <div class="chip" onclick="toggleChip(this)">buzdolabı düzeni</div>
+          <div class="chip" onclick="toggleChip(this)">poska</div>
+          <div class="chip" onclick="toggleChip(this)">porsiyon kalıbı</div>
+          <div class="chip" onclick="toggleChip(this)">diyet yemek</div>
+          <div class="chip" onclick="toggleChip(this)">dondurucu düzeni</div>
+          <div class="chip" onclick="toggleChip(this)">gıda saklama</div>
+          <div class="chip" onclick="toggleChip(this)">silikon saklama</div>
+        </div>
+        <input type="text" id="blog-extra-kw" placeholder="Ekstra kelime (virgülle ayır)" style="margin-top:8px;">
+      </div>
+
+      <button class="btn-generate" onclick="generate('blog')">
+        <span>✦</span> Blog Yazısı Üret
+      </button>
+    </div>
+
+    <!-- SOCIAL TAB -->
+    <div class="tab-panel" id="panel-social">
+
+      <div class="field-group">
+        <div class="section-label">Platform</div>
+        <div class="platform-toggle">
+          <div class="platform-btn active" onclick="selectPlatform(this,'instagram')">Instagram</div>
+          <div class="platform-btn" onclick="selectPlatform(this,'tiktok')">TikTok</div>
+          <div class="platform-btn" onclick="selectPlatform(this,'her-ikisi')">Her İkisi</div>
+        </div>
+        <input type="hidden" id="social-platform" value="instagram">
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">İçerik Türü</div>
+        <div class="mode-grid">
+          <div class="mode-card active" onclick="selectMode(this,'social-type','urun-tanitim')" data-val="urun-tanitim">
+            <div class="mode-card-icon">🛍️</div>
+            <div class="mode-card-title">Ürün Tanıtımı</div>
+            <div class="mode-card-desc">Poska showcase</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'social-type','ipucu')" data-val="ipucu">
+            <div class="mode-card-icon">💡</div>
+            <div class="mode-card-title">İpucu / Hack</div>
+            <div class="mode-card-desc">Mutfak tüyosu</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'social-type','before-after')" data-val="before-after">
+            <div class="mode-card-icon">🔄</div>
+            <div class="mode-card-title">Before / After</div>
+            <div class="mode-card-desc">Dönüşüm anlatısı</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'social-type','egitici')" data-val="egitici">
+            <div class="mode-card-icon">🎓</div>
+            <div class="mode-card-title">Eğitici</div>
+            <div class="mode-card-desc">Bilgi paylaşımı</div>
+          </div>
+        </div>
+        <input type="hidden" id="social-type" value="urun-tanitim">
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Ton</div>
+        <select id="social-tone">
+          <option value="samimi">Samimi ve sıcak</option>
+          <option value="ilham-verici">İlham verici</option>
+          <option value="eglenceli">Eğlenceli ve enerjik</option>
+          <option value="bilgilendirici">Bilgilendirici</option>
+          <option value="merak-uyandiran">Merak uyandıran</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Konu / Fikir</div>
+        <input type="text" id="social-topic" placeholder="Örn: haftalık hazırlık rutinum...">
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Hashtag Sayısı</div>
+        <select id="social-hashtag">
+          <option value="az">Az (5-8)</option>
+          <option value="orta" selected>Orta (10-15)</option>
+          <option value="cok">Çok (20-25)</option>
+        </select>
+      </div>
+
+      <button class="btn-generate" onclick="generate('social')">
+        <span>✦</span> Caption Üret
+      </button>
+    </div>
+
+    <!-- MATERIAL TAB -->
+    <div class="tab-panel" id="panel-material">
+
+      <div class="field-group">
+        <div class="section-label">İçerik Kategorisi</div>
+        <div class="mode-grid">
+          <div class="mode-card active" onclick="selectMode(this,'mat-type','silikon-nedir')" data-val="silikon-nedir">
+            <div class="mode-card-icon">🔬</div>
+            <div class="mode-card-title">Silikon Nedir?</div>
+            <div class="mode-card-desc">Materyal bilgisi</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'mat-type','plastik-vs-silikon')" data-val="plastik-vs-silikon">
+            <div class="mode-card-icon">⚖️</div>
+            <div class="mode-card-title">Silikon vs Plastik</div>
+            <div class="mode-card-desc">Karşılaştırma</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'mat-type','temizlik')" data-val="temizlik">
+            <div class="mode-card-icon">🧼</div>
+            <div class="mode-card-title">Temizlik Rehberi</div>
+            <div class="mode-card-desc">Bakım talimatları</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'mat-type','gida-guvenligi')" data-val="gida-guvenligi">
+            <div class="mode-card-icon">🛡️</div>
+            <div class="mode-card-title">Gıda Güvenliği</div>
+            <div class="mode-card-desc">BPA, sertifikalar</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'mat-type','sicaklik-dayanimi')" data-val="sicaklik-dayanimi">
+            <div class="mode-card-icon">🌡️</div>
+            <div class="mode-card-title">Sıcaklık Dayanımı</div>
+            <div class="mode-card-desc">Fırın, dondurucu</div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this,'mat-type','cevre')" data-val="cevre">
+            <div class="mode-card-icon">🌱</div>
+            <div class="mode-card-title">Çevre & Sürdürülebilirlik</div>
+            <div class="mode-card-desc">Plastik azaltma</div>
+          </div>
+        </div>
+        <input type="hidden" id="mat-type" value="silikon-nedir">
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Format</div>
+        <select id="mat-format">
+          <option value="blog">Blog yazısı</option>
+          <option value="sss">Sık sorulan sorular</option>
+          <option value="infografik-metin">İnfografik metni (kısa maddeler)</option>
+          <option value="sosyal">Sosyal medya carousel metni</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Uzunluk</div>
+        <select id="mat-length">
+          <option value="kisa">Kısa (300-500 kelime)</option>
+          <option value="orta" selected>Orta (700-900 kelime)</option>
+          <option value="uzun">Uzun (1200+ kelime)</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Özel Not (isteğe bağlı)</div>
+        <textarea id="mat-note" placeholder="Vurgulanmasını istediğin özel bir bilgi, soru veya detay..."></textarea>
+      </div>
+
+      <button class="btn-generate" onclick="generate('material')">
+        <span>✦</span> İçerik Üret
+      </button>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-panel" id="panel-settings">
+      <div class="field-group">
+        <div class="section-label">Claude API Key</div>
+        <div class="api-row">
+          <div class="api-status" id="api-status-dot"></div>
+          <input type="password" id="api-key-input" placeholder="sk-ant-..." style="flex:1;">
+        </div>
+        <button class="btn-secondary" style="margin-top:8px;width:100%;justify-content:center;" onclick="saveKey()">Kaydet</button>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6;">
+          API key tarayıcında saklanır, hiçbir yere gönderilmez.<br>
+          Almak için: console.anthropic.com → API Keys
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field-group">
+        <div class="section-label">Marka Tonu</div>
+        <textarea id="brand-tone" style="min-height:100px;" placeholder="Örn: Samimi, modern, bilgilendirici. Jargon kullanma. Okuyucuya 'sen' diye hitap et...">Samimi ve sıcak bir dil kullan. Okuyucuya "sen" diye hitap et. Türkçe yaz, yabancı kelimelerden kaçın. Poska'yı doğal bir şekilde içeriğe dahil et ama reklam gibi hissettirme. Bilgilendirici ve güvenilir bir ton benimse.</textarea>
+      </div>
+
+      <div class="field-group">
+        <div class="section-label">Site URL (internal link için)</div>
+        <input type="text" id="site-url" value="poskamutfak.com" placeholder="poskamutfak.com">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="output-header">
+      <div class="output-title" id="output-label">Çıktı</div>
+      <div class="output-actions">
+        <button class="btn-secondary" onclick="copyOutput()" id="copy-btn" style="display:none;">📋 Kopyala</button>
+        <button class="btn-secondary" onclick="copyForIkas()" id="ikas-btn" style="display:none;">🛒 İkas için Kopyala</button>
+      </div>
+    </div>
+
+    <div class="loading-bar" id="loading-bar">
+      <div class="loading-bar-inner"></div>
+    </div>
+
+    <div id="meta-section" style="display:none;" class="meta-section">
+      <div class="meta-card">
+        <div class="meta-card-label">SEO Başlığı</div>
+        <div class="meta-card-value" id="meta-title">—</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-card-label">Meta Açıklama</div>
+        <div class="meta-card-value" id="meta-desc">—</div>
+      </div>
+    </div>
+
+    <div class="output-box empty" id="output-box">
+      <div class="empty-icon">✦</div>
+      <div>Sol panelden ayarları yapıp üret butonuna bas</div>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+  let currentOutput = '';
+  let currentMeta = {};
+
+  // TAB SWITCHING
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t,i) => {
+      const tabs = ['blog','social','material','settings'];
+      t.classList.toggle('active', tabs[i] === tab);
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  // MODE CARD SELECTION
+  function selectMode(el, inputId, val) {
+    el.closest('.field-group').querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(inputId).value = val;
+  }
+
+  // PLATFORM TOGGLE
+  function selectPlatform(el, val) {
+    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('social-platform').value = val;
+  }
+
+  // CHIP TOGGLE
+  function toggleChip(el) { el.classList.toggle('active'); }
+
+  function getActiveChips() {
+    return Array.from(document.querySelectorAll('#blog-chips .chip.active')).map(c => c.textContent);
+  }
+
+  // API KEY
+  function saveKey() {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (key) {
+      localStorage.setItem('poska_api_key', key);
+      document.getElementById('api-status-dot').classList.add('ok');
+      showNotif('✓ API key kaydedildi');
+    }
+  }
+
+  function getKey() {
+    const key = localStorage.getItem('poska_api_key') || document.getElementById('api-key-input').value.trim();
+    if (key) document.getElementById('api-status-dot').classList.add('ok');
+    return key;
+  }
+
+  window.onload = () => {
+    const key = localStorage.getItem('poska_api_key');
+    if (key) {
+      document.getElementById('api-key-input').value = key;
+      document.getElementById('api-status-dot').classList.add('ok');
+    }
+  };
+
+  // TOPIC SUGGESTION
+  async function suggestTopic() {
+    const key = getKey();
+    if (!key) { showNotif('⚠️ Önce API key gir (Ayarlar)'); return; }
+    const audience = document.getElementById('blog-audience').value;
+    const mode = document.getElementById('blog-mode').value;
+    const kws = getActiveChips().join(', ');
+
+    const prompt = `Poska (porsiyon saklama silikon kalıbı) markası için "${audience}" hedef kitlesine yönelik, "${mode}" formatında 5 adet Türkçe blog başlığı öner. Anahtar kelimeler: ${kws}. Sadece numaralı liste olarak ver, başka açıklama ekleme.`;
+
+    try {
+      const res = await callClaude(key, prompt, 300);
+      document.getElementById('blog-topic').value = '';
+      showOutput('Başlık Önerileri', res, false);
+    } catch(e) { showNotif('⚠️ Hata: ' + e.message); }
+  }
+
+  // MAIN GENERATE
+  async function generate(tab) {
+    const key = getKey();
+    if (!key) { showNotif('⚠️ API key gerekli — Ayarlar sekmesine git'); return; }
+
+    const brandTone = document.getElementById('brand-tone').value;
+    const siteUrl = document.getElementById('site-url').value;
+    let prompt = '';
+    let label = '';
+    let needMeta = false;
+
+    if (tab === 'blog') {
+      const audience = document.getElementById('blog-audience').value;
+      const mode = document.getElementById('blog-mode').value;
+      const length = document.getElementById('blog-length').value;
+      const topic = document.getElementById('blog-topic').value;
+      const kws = getActiveChips().join(', ');
+      const extraKw = document.getElementById('blog-extra-kw').value;
+      const allKws = [kws, extraKw].filter(Boolean).join(', ');
+      needMeta = true;
+      label = 'Blog Yazısı';
+
+      const lengthMap = { kisa:'400-600 kelime', orta:'800-1000 kelime', uzun:'1200-1500 kelime', kapsamli:'2000+ kelime' };
+      const modeMap = { rehber:'rehber/nasıl yapılır', liste:'liste yazısı (Top X formatı)', karsilastirma:'karşılaştırma yazısı', hikaye:'kişisel hikaye/deneyim', sss:'sık sorulan sorular (S&C)', tarifle:'tarif + porsiyon saklama rehberi' };
+
+      prompt = `Sen Poska markasının içerik yazarısın. Poska, gıda sınıfı silikondan üretilmiş, 2x2 grid 4 bölmeli (her biri 250ml), dondurucu, fırın ve bulaşık makinesine uygun bir porsiyon saklama kalıbıdır.
+
+Marka tonu: ${brandTone}
+
+Aşağıdaki kriterlere göre Türkçe blog yazısı yaz:
+- Hedef kitle: ${audience}
+- Format: ${modeMap[mode] || mode}
+- Uzunluk: ${lengthMap[length] || length}
+- Konu/başlık fikri: ${topic || 'Kendin belirle, SEO uyumlu seç'}
+- SEO anahtar kelimeleri (doğal kullan): ${allKws}
+- Site: ${siteUrl}
+
+ZORUNLU YAPI:
+1. İlk satır: ### SEO_BASLIK: [başlık]
+2. İkinci satır: ### META: [155 karakter max meta açıklama]
+3. Sonra H1 başlık
+4. Giriş paragrafı
+5. H2 alt başlıklar ile içerik
+6. Sonuç ve CTA (Poska'ya nazikçe yönlendir)
+7. Anahtar kelimeleri doğal şekilde yerleştir
+
+Sadece yazıyı yaz, ek açıklama ekleme.`;
+
+    } else if (tab === 'social') {
+      const platform = document.getElementById('social-platform').value;
+      const type = document.getElementById('social-type').value;
+      const tone = document.getElementById('social-tone').value;
+      const topic = document.getElementById('social-topic').value;
+      const hashtag = document.getElementById('social-hashtag').value;
+      label = 'Sosyal Medya Caption';
+
+      const hashtagCount = { az:'5-8', orta:'10-15', cok:'20-25' };
+      const platformMap = { instagram:'Instagram', tiktok:'TikTok', 'her-ikisi':'hem Instagram hem TikTok (iki ayrı caption yaz)' };
+      const typeMap = { 'urun-tanitim':'ürün tanıtımı/showcase', ipucu:'ipucu/mutfak hack', 'before-after':'before-after dönüşüm anlatısı', egitici:'eğitici içerik' };
+
+      prompt = `Sen Poska markasının sosyal medya yöneticisisin. Poska, gıda sınıfı silikondan üretilmiş porsiyon saklama kalıbıdır.
+
+Marka tonu: ${brandTone}
+
+${platformMap[platform]} için Türkçe caption yaz:
+- İçerik türü: ${typeMap[type] || type}
+- Ton: ${tone}
+- Konu/fikir: ${topic || 'Ürünün faydalarını vurgula'}
+- Hashtag sayısı: ${hashtagCount[hashtag]} adet
+
+Caption yapısı:
+1. Hook (ilk 1-2 cümle dikkat çekici olsun)
+2. Ana içerik (kısa ve etkili)
+3. CTA (Linke tıkla, yorum yap vb.)
+4. Hashtagler (alta, ayrı satırda)
+
+Emoji kullan ama aşırıya kaçma. Sadece caption'ı yaz.`;
+
+    } else if (tab === 'material') {
+      const type = document.getElementById('mat-type').value;
+      const format = document.getElementById('mat-format').value;
+      const length = document.getElementById('mat-length').value;
+      const note = document.getElementById('mat-note').value;
+      needMeta = format === 'blog';
+      label = 'Materyal & Güvenlik İçeriği';
+
+      const typeMap = {
+        'silikon-nedir': 'silikon malzemenin ne olduğu, nasıl üretildiği, özellikleri',
+        'plastik-vs-silikon': 'plastik ile silikon saklama kaplarının detaylı karşılaştırması (sağlık, çevre, dayanıklılık, maliyet)',
+        'temizlik': 'silikon saklama kaplarının doğru temizlik ve bakım yöntemleri',
+        'gida-guvenligi': 'food-grade silikon nedir, BPA-free, sertifikalar, güvenlik standartları',
+        'sicaklik-dayanimi': 'silikonun sıcaklık dayanımı, dondurucu, bulaşık makinesi, fırın kullanımı',
+        'cevre': 'silikonyun çevresel avantajları, plastik alternatifi, sürdürülebilirlik'
+      };
+      const formatMap = { blog:'blog yazısı', sss:'sık sorulan sorular', 'infografik-metin':'infografik için kısa ve öz maddeler', sosyal:'sosyal medya carousel slayt metinleri' };
+      const lengthMap = { kisa:'300-500 kelime', orta:'700-900 kelime', uzun:'1200+ kelime' };
+
+      prompt = `Sen Poska markasının içerik yazarısın. Poska gıda sınıfı (food-grade) silikondan üretilmiş porsiyon saklama kalıbıdır.
+
+Marka tonu: ${brandTone}
+
+Konu: ${typeMap[type] || type}
+Format: ${formatMap[format] || format}
+Uzunluk: ${lengthMap[length] || length}
+${note ? 'Özel not: ' + note : ''}
+
+${format === 'blog' ? `ZORUNLU YAPI:
+1. İlk satır: ### SEO_BASLIK: [başlık]
+2. İkinci satır: ### META: [meta açıklama]
+3. Sonra içerik` : ''}
+
+Bilimsel olarak doğru, ama anlaşılır Türkçe yaz. Poska'ya doğal referans ver. Sadece içeriği yaz.`;
+    }
+
+    setLoading(true, label);
+
+    try {
+      const res = await callClaude(key, prompt, 2000);
+      let meta = {};
+      let content = res;
+
+      if (needMeta) {
+        const titleMatch = res.match(/###\s*SEO_BASLIK:\s*(.+)/);
+        const metaMatch = res.match(/###\s*META:\s*(.+)/);
+        if (titleMatch) meta.title = titleMatch[1].trim();
+        if (metaMatch) meta.desc = metaMatch[1].trim();
+        content = res.replace(/###\s*SEO_BASLIK:.+\n?/, '').replace(/###\s*META:.+\n?/, '').trim();
+      }
+
+      showOutput(label, content, needMeta, meta);
+    } catch(e) {
+      setLoading(false, '');
+      showNotif('⚠️ Hata: ' + e.message);
+    }
+  }
+
+  // CLAUDE API CALL
+  async function callClaude(key, prompt, maxTokens) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'API hatası');
+    }
+    const data = await res.json();
+    return data.content[0].text;
+  }
+
+  // UI HELPERS
+  function setLoading(active, label) {
+    document.getElementById('loading-bar').classList.toggle('active', active);
+    document.querySelectorAll('.btn-generate').forEach(b => b.disabled = active);
+    if (active) {
+      document.getElementById('output-label').textContent = label + ' üretiliyor...';
+      document.getElementById('output-box').className = 'output-box empty';
+      document.getElementById('output-box').innerHTML = '<div class="empty-icon">⟳</div><div>Üretiliyor, lütfen bekle...</div>';
+      document.getElementById('copy-btn').style.display = 'none';
+      document.getElementById('ikas-btn').style.display = 'none';
+      document.getElementById('meta-section').style.display = 'none';
+    }
+  }
+
+  function showOutput(label, content, hasMeta, meta = {}) {
+    setLoading(false, '');
+    currentOutput = content;
+    currentMeta = meta;
+
+    document.getElementById('output-label').textContent = label;
+    document.getElementById('output-box').className = 'output-box';
+    document.getElementById('output-box').textContent = content;
+    document.getElementById('copy-btn').style.display = 'flex';
+    document.getElementById('ikas-btn').style.display = hasMeta ? 'flex' : 'none';
+
+    if (hasMeta && (meta.title || meta.desc)) {
+      document.getElementById('meta-section').style.display = 'grid';
+      document.getElementById('meta-title').textContent = meta.title || '—';
+      document.getElementById('meta-desc').textContent = meta.desc || '—';
+    }
+  }
+
+  function copyOutput() {
+    navigator.clipboard.writeText(currentOutput).then(() => showNotif('✓ Panoya kopyalandı'));
+  }
+
+  function copyForIkas() {
+    const text = `SEO BAŞLIĞI:\n${currentMeta.title || ''}\n\nMETA AÇIKLAMA:\n${currentMeta.desc || ''}\n\nİÇERİK:\n${currentOutput}`;
+    navigator.clipboard.writeText(text).then(() => showNotif('✓ İkas formatında kopyalandı'));
+  }
+
+  function showNotif(msg) {
+    const n = document.getElementById('notif');
+    n.textContent = msg;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>
